@@ -68,6 +68,12 @@ export default class UserList extends Vue {
     }
 
     async addUsersToList() {
+        if (this.offsetUsers > this.userIds.length) {
+            return new Promise((_, reject) => {
+                reject(new Error('Users not found.'));
+            });
+        }
+
         this.userIds = await axios.get('/user_ids').then(({ data }) => data);
         const newUsers =  await this.fetchUserData(this.nextUsersIds);
         this.users.push(...newUsers);
