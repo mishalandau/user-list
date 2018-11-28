@@ -1,6 +1,6 @@
 <template>
 <transition name="fade">
-    <v-touch v-if="!hideData"
+    <v-touch v-if="!hideData && users.length"
         @panmove="panmoveHandler"
         @swipeleft="swipeHandler"
         @swiperight="swipeHandler"
@@ -98,7 +98,7 @@ export default class UserList extends Vue {
             }
 
             this.userIds = userIdsStorage;
-        } catch(_) {
+        } catch (_) {
             this.userIds = await axios.get('/user_ids').then(({ data }) => data);
             localStorage.setItem('user_ids', JSON.stringify(this.userIds));
         }
@@ -153,8 +153,8 @@ export default class UserList extends Vue {
         this.offsetLeft = 0;
         this.animationClass = true;
         setTimeout(() => {
-            this.animationClass = false;            
-        }, 300);
+            this.animationClass = false;
+        }, 500);
     }
 
     clearData() {
@@ -171,7 +171,10 @@ export default class UserList extends Vue {
     created() {
         try {
             this.users = JSON.parse(localStorage.getItem('users') as any) || [];
-        } catch(_) {
+            if (!this.users.length) {
+                throw new Error('users not found in localStorage');
+            }
+        } catch (_) {
             this.addUsersToList();
         }
         document.addEventListener('scroll', this.handleScroll);
